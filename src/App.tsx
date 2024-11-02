@@ -1,19 +1,16 @@
-
 import './App.css'
+import { ImageAreaSelector } from './components/ImageAreaSelector'
 
 function App () {
+
 
   return (
     <><div className="main-content">
       <h1>Image Analyzer</h1>
       <div className="analyzer-container">
-        <div className="image-container">
-          <img
-            src="https://dummyimage.com/280/c4c4c4/ffffff&text=frame"
-            alt="Placeholder for uploaded image"
-          />
-          <div className="annotation"></div>
-        </div>
+
+        <ImageAreaSelector />
+
         <div className="sidebar">
           <div className="search-bar">
             <input type="text" placeholder="Search options..." />
