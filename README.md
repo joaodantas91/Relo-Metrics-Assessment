@@ -1,50 +1,86 @@
-# React + TypeScript + Vite
+# Image Annotation Analyzer - Front-End Coding Challenge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project is a front-end challenge developed using React, TypeScript, and Vite.
+  
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+  
 
-- Configure the top-level `parserOptions` property like this:
+To set up this project locally, follow these steps:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+  
+
+1.  **Clone the repository:**
+
+```bash
+
+git clone https://github.com/joaodantas91/Relo-Metrics-Assessment
+
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+2.  **Navigate into the project directory:**
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```bash
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+cd yourproject
+
 ```
+
+3.  **Install dependencies:**
+
+```bash
+
+npm install
+
+```
+
+## Usage
+
+  
+
+To start using the application:
+
+  
+
+1.  **Run the Development Server:**
+
+```bash
+
+npm run dev
+
+```
+
+2.  **Build for Production:**
+
+```bash
+
+npm run build
+
+```
+
+This command creates a production-ready build in the `dist` directory.
+
+  
+
+3.  **Preview Production Build:**
+
+```bash
+
+npm run preview
+
+```
+
+This command serves the production build locally for testing.
+
+## Process and Choices
+
+When I started reading the test, the first thing I thought of was using a canvas to render the selection. The canvas was rendered over the image and matched the image’s dimensions. As I neared the end of the test, I realized I was using relative sizes and that the images were being resized to fit within the container. To address this, I used proportional calculations to convert the selection sizes relative to the original image dimensions. This way, regardless of the rendered size of the image and canvas, the values would be accurate for the source image as well.
+
+For category searching, I integrated a library for fuzzy search to improve usability. This allows users to search categories by name or ID, even with minor typos, similar to SQL's "LIKE" functionality.
+
+This project was very enjoyable to develop because it includes unique features that require creative solutions. Thank you for the opportunity!
