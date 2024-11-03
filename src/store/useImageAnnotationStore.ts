@@ -73,6 +73,10 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
       })
     },
     async discart () {
+      const annotation = get().annotation;
+      if (annotation.imageId === undefined) {
+        return;
+      }
       const response = await fetch(
         "https://eb1b6f8bfab448df91c68bd442d6a968.api.mockbin.io/annotationsd",
         {
@@ -80,19 +84,18 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(get().annotation)
+          body: JSON.stringify(annotation)
         }
       );
 
       if (response.status === 200) {
         set((state) => {
-          state.queuedImages = state.queuedImages.filter(({ id }) => id !== state.annotation.imageId)
+          state.queuedImages = state.queuedImages.filter(({ id }) => id !== state.annotation.imageId);
 
           state.annotation = {
             annotations: [],
-            imageId: state.queuedImages[0].id
+            imageId: state.queuedImages.length >= 1 ? state.queuedImages[0].id : undefined
           }
-
         })
 
       }
