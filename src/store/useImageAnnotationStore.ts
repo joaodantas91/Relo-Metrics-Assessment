@@ -1,5 +1,6 @@
 import { immer } from "zustand/middleware/immer";
 import { create } from "zustand"
+import { getCategories, getUnalyzedImages, postAnnotation } from "../services/annotationService";
 
 export type BoundingBoxes = {
   topLeftX: number,
@@ -8,17 +9,19 @@ export type BoundingBoxes = {
   height: number
 }
 
+export type Annotation = {
+  imageId?: number,
+  annotations: {
+    categoryId?: number,
+    boundingBoxes?: BoundingBoxes[]
+  }[]
+}
+
 interface ImageAnnotation {
   queuedImages: { id: number, url: string }[]
   categories: { id: number, name: string }[]
   fetchInitialData: () => void
-  annotation: {
-    imageId?: number,
-    annotations: {
-      categoryId?: number,
-      boundingBoxes?: BoundingBoxes[]
-    }[]
-  }
+  annotation: Annotation
   setCategory: (id: number) => void
   setboundingBoxes: (boundingBoxes: BoundingBoxes) => void
   setAnnotationImage: (id: number) => void
@@ -61,8 +64,8 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
     },
     async fetchInitialData () {
       const [images, categories] = await Promise.all([
-        fetch("https://5f2f729312b1481b9b1b4eb9d00bc455.api.mockbin.io/unanalyzed-images"),
-        fetch("https://f6fe9241e02b404689f62c585d0bd967.api.mockbin.io/categories"),
+        getUnalyzedImages(),
+        getCategories()
       ]).then(async (res) => {
         return Promise.all(
           res.map(async (data) => await data.json())
@@ -82,16 +85,7 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
       if (annotation.imageId === undefined) {
         return;
       }
-      const response = await fetch(
-        "https://eb1b6f8bfab448df91c68bd442d6a968.api.mockbin.io/annotationsd",
-        {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(annotation)
-        }
-      );
+      const response = await postAnnotation({ data: annotation })
 
       if (response.status === 200) {
         get().removeActualImageAnnotation()
@@ -100,16 +94,11 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
     },
     async confirm () {
       const annotation = get().annotation;
-      const response = await fetch(
-        "https://eb1b6f8bfab448df91c68bd442d6a968.api.mockbin.io/annotationsd",
-        {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(annotation)
-        }
-      );
+      if (annotation.imageId === undefined) {
+        return;
+      }
+
+      const response = await postAnnotation({ data: annotation })
 
       if (response.status === 200) {
         get().removeActualImageAnnotation()
