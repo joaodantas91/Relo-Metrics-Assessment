@@ -1,6 +1,10 @@
 import { ReactEventHandler, useLayoutEffect, useRef, useState } from "react";
 
-export function ImageAreaSelector () {
+type ImageAreaSelectorProps = {
+  src: string
+}
+
+export function ImageAreaSelector ({ src }: ImageAreaSelectorProps) {
 
   const imageRef = useRef<HTMLImageElement>(null);
   const selectionCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,20 +35,26 @@ export function ImageAreaSelector () {
         }
       };
     }
-  }, [])
+  }, [rect])
 
   const onImageLoad: ReactEventHandler<HTMLImageElement> = (e) => {
     setRect(e.currentTarget.getBoundingClientRect())
   }
+
   return (
     <div className="image-container">
-      <canvas id="c2" ref={selectionCanvasRef} width={rect?.width} height={rect?.height}></canvas>
-      <img
-        onLoad={onImageLoad}
-        ref={imageRef}
-        src="https://s3.amazonaws.com/sports-universal-frame-extraction/Bassmaster20Elite20at20Wheeler20Lake2020Live20Day2032028061520242920FOXy9lakogv7hr.1.0fps/frames/0009693000.JPEG"
-        alt="Placeholder for uploaded image"
-      />
+      {src?.length > 0 &&
+        <>
+          <canvas id="c2" ref={selectionCanvasRef} width={rect?.width} height={rect?.height}></canvas>
+          <img
+            onLoad={onImageLoad}
+            ref={imageRef}
+            src={src}
+            alt="Placeholder for uploaded image"
+          />
+        </>
+      }
+
     </div>
   )
 }

@@ -1,47 +1,55 @@
+import { useEffect, useMemo } from 'react';
 import './App.css'
 import { ImageAreaSelector } from './components/ImageAreaSelector'
+import { useImageAnnotationStore } from './store/useImageAnnotationStore'
+import { ImageQueue } from './components/ImageQueueSelector';
+import { CategorySelector } from './components/CategorySelector';
 
 function App () {
+  const { fetchInitialData, annotation, queuedImages, confirm, discart } = useImageAnnotationStore();
 
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData])
+
+  useEffect(() => {
+    console.log(annotation);
+  }, [annotation])
+
+  const selectingImageUrl = useMemo(() => {
+    return queuedImages.filter(img => img.id === annotation.imageId)[0]?.url
+  }, [annotation.imageId, queuedImages])
 
   return (
     <><div className="main-content">
       <h1>Image Analyzer</h1>
       <div className="analyzer-container">
 
-        <ImageAreaSelector />
+        <ImageAreaSelector src={selectingImageUrl} />
 
         <div className="sidebar">
-          <div className="search-bar">
-            <input type="text" placeholder="Search options..." />
-          </div>
-          <ul className="options-list">
-            <li className="highlight">Option 1</li>
-            <li>Option 2</li>
-            <li>Option 3</li>
-            <li>Option 4</li>
-          </ul>
+
+
+          <CategorySelector />
+
           <div className="buttons">
-            <button>Discard</button>
-            <button>Confirm</button>
+
+            <button
+              type="button"
+              onClick={() => {
+                discart()
+              }}
+            >
+              Discard
+            </button>
+
+            <button type="button" onClick={() => {
+              confirm()
+            }}>Confirm</button>
           </div>
         </div>
       </div>
-      <div className="image-queue">
-        <h2>Next images in queue:</h2>
-        <ul className="queue-list">
-          <li className="queue-item">Image 1</li>
-          <li className="queue-item">Image 2</li>
-          <li className="queue-item">Image 3</li>
-          <li className="queue-item">Image 4</li>
-          <li className="queue-item">Image 5</li>
-          <li className="queue-item">Image 6</li>
-          <li className="queue-item">Image 7</li>
-          <li className="queue-item">Image 8</li>
-          <li className="queue-item">Image 9</li>
-          <li className="queue-item">Image 10</li>
-        </ul>
-      </div>
+      <ImageQueue />
     </div>
     </>
   )
