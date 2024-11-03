@@ -1,12 +1,12 @@
 import { immer } from "zustand/middleware/immer";
 import { create } from "zustand"
 
-type BoundingBoxes = [{
+export type BoundingBoxes = {
   topLeftX: number,
   topLeftY: number,
   width: number,
   height: number
-}]
+}
 
 interface ImageAnnotation {
   queuedImages: { id: number, url: string }[]
@@ -16,14 +16,16 @@ interface ImageAnnotation {
     imageId?: number,
     annotations: {
       categoryId?: number,
-      boundingBoxes?: BoundingBoxes
+      boundingBoxes?: BoundingBoxes[]
     }[]
-  },
-  setCategory: (id: number) => void,
-  setboundingBoxes: (boundingBoxes: BoundingBoxes) => void,
-  setAnnotationImage: (id: number) => void,
+  }
+  setCategory: (id: number) => void
+  setboundingBoxes: (boundingBoxes: BoundingBoxes) => void
+  setAnnotationImage: (id: number) => void
   discart: () => void
   confirm: () => void
+  removeActualImageAnnotation: () => void
+  setNewImageAnnotation: () => void
 }
 
 export const useImageAnnotationStore = create<ImageAnnotation>()(
@@ -43,7 +45,10 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
     },
     setboundingBoxes (boundingBoxes: BoundingBoxes) {
       set((state) => {
-        state.annotation.annotations[0].boundingBoxes = boundingBoxes
+        state.annotation.annotations[0] = {
+          ...state.annotation.annotations[0],
+          boundingBoxes: [boundingBoxes]
+        }
       })
     },
     setAnnotationImage (id: number) {
@@ -89,19 +94,42 @@ export const useImageAnnotationStore = create<ImageAnnotation>()(
       );
 
       if (response.status === 200) {
-        set((state) => {
-          state.queuedImages = state.queuedImages.filter(({ id }) => id !== state.annotation.imageId);
-
-          state.annotation = {
-            annotations: [],
-            imageId: state.queuedImages.length >= 1 ? state.queuedImages[0].id : undefined
-          }
-        })
-
+        get().removeActualImageAnnotation()
+        get().setNewImageAnnotation();
       }
     },
-    confirm () {
-      console.log("confirm")
+    async confirm () {
+      const annotation = get().annotation;
+      const response = await fetch(
+        "https://eb1b6f8bfab448df91c68bd442d6a968.api.mockbin.io/annotationsd",
+        {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(annotation)
+        }
+      );
+
+      if (response.status === 200) {
+        get().removeActualImageAnnotation()
+        get().setNewImageAnnotation();
+      }
     },
+
+    removeActualImageAnnotation () {
+      set((state) => {
+        state.queuedImages = state.queuedImages.filter(({ id }) => id !== state.annotation.imageId);
+      })
+    },
+
+    setNewImageAnnotation () {
+      set((state) => {
+        state.annotation = {
+          annotations: [],
+          imageId: state.queuedImages.length >= 1 ? state.queuedImages[0].id : undefined
+        }
+      })
+    }
   }))
 );

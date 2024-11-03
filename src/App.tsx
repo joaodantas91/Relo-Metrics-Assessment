@@ -43,9 +43,17 @@ function App () {
               Discard
             </button>
 
-            <button type="button" onClick={() => {
-              confirm()
-            }}>Confirm</button>
+            <button
+              type="button"
+              disabled={
+                annotation.annotations[0]?.categoryId === undefined ||
+                !annotation.annotations[0].boundingBoxes ||
+                !(annotation.annotations[0].boundingBoxes.length > 0)
+              }
+              onClick={() => {
+                confirm()
+              }}
+            >Confirm</button>
           </div>
         </div>
       </div>
